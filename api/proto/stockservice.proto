@@ -1,0 +1,31 @@
+// Copyright (c) 2023 Tiago Melo. All rights reserved.
+// Use of this source code is governed by the MIT License that can be found in
+// the LICENSE file.
+syntax = "proto3";
+
+package stockservice;
+
+option go_package = "github.com/tiagomelo/golang-grpc-backpressure/api/proto/gen/stockservice";
+
+// Service definition
+service StockService {
+    // Server-streaming RPC for sending stock updates to clients.
+    rpc GetUpdates(EmptyRequest) returns (stream StockUpdate);
+}
+
+// Empty message sent by the client to request stock updates.
+message EmptyRequest {}
+
+// Message containing detailed stock update information.
+message StockUpdate {
+    string ticker = 1;       // Stock ticker symbol, e.g., "AAPL" for Apple Inc.
+    double price = 2;        // Current stock price.
+    double change = 3;       // Price change since the last update.
+    double changePercent = 4; // Price change percentage since the last update.
+    int64 volume = 5;        // Trading volume for the current day.
+    double openPrice = 6;    // Opening price for the current trading session.
+    double highPrice = 7;    // Highest price reached during the current trading session.
+    double lowPrice = 8;     // Lowest price reached during the current trading session.
+    int64 marketCap = 9;     // Market capitalization.
+    string timestamp = 10;   // Timestamp of the update, e.g., "2023-08-16T15:04:05Z".
+}
