@@ -31,3 +31,26 @@ server:
 ## client: runs gRPC client
 client:
 	@ go run client/client.go
+
+.PHONY: client-random-processing-time
+## client-random-processing-time: runs gRPC client that sleeps at random times
+client-random-processing-time:
+	@ go run client/client.go -r
+
+# ==============================================================================
+# Metrics
+
+.PHONY: parse-templates
+## parse-templates: parses Prometheus scrapes and datasource templates
+parse-templates:
+	@ go run templateparser/templateparser.go
+
+.PHONY: obs
+## obs: runs both prometheus and grafana
+obs: parse-templates
+	@ docker-compose up
+
+.PHONY: obs-stop
+## obs-stop: stops both prometheus and grafana
+obs-stop:
+	@ docker-compose down

@@ -6,6 +6,8 @@ package server
 import (
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/tiagomelo/golang-grpc-backpressure/api/proto/gen/stockservice"
 	"github.com/tiagomelo/golang-grpc-backpressure/stock"
 	"google.golang.org/grpc"
@@ -13,6 +15,11 @@ import (
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 )
+
+var sentUpdatesCounter = promauto.NewCounter(prometheus.CounterOpts{
+	Name: "stock_updates_sent_total",
+	Help: "The total number of stock updates sent by the server",
+})
 
 // server struct holds the gRPC server instance and implements the StockServiceServer interface.
 type server struct {
@@ -46,6 +53,7 @@ func (s *server) GetUpdates(_ *stockservice.EmptyRequest, stream stockservice.St
 		if err := stream.Send(update); err != nil {
 			return status.Error(codes.Unknown, "failed to send update to client: "+err.Error())
 		}
+		sentUpdatesCounter.Inc()
 		time.Sleep(1 * time.Second) // Wait for a second before sending the next update.
 	}
 }

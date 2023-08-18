@@ -7,17 +7,36 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/tiagomelo/golang-grpc-backpressure/config"
 	"github.com/tiagomelo/golang-grpc-backpressure/server"
 )
+
+func metricsHandler() http.Handler {
+	return promhttp.Handler()
+}
+
+func metricsServer(cfg *config.Config) {
+	port := fmt.Sprintf(":%d", cfg.StockServiceMetricsServerPort)
+	http.Handle("/metrics", metricsHandler())
+	log.Fatal(http.ListenAndServe(port, nil))
+}
 
 func run(logger *log.Logger) error {
 	logger.Println("main: initializing gRPC server")
 	defer logger.Println("main: Completed")
+
+	// Reading config.
+	cfg, err := config.Read()
+	if err != nil {
+		return errors.Wrap(err, "reading config")
+	}
 
 	const port = ":4444"
 	lis, err := net.Listen("tcp", port)
@@ -36,6 +55,9 @@ func run(logger *log.Logger) error {
 	// buffered channel so the goroutine can exit if we don't collect this error.
 
 	serverErrors := make(chan error, 1)
+
+	// Start the metrics server.
+	go metricsServer(cfg)
 
 	// Start the service listening for requests.
 	go func() {
