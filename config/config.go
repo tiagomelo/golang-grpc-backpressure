@@ -8,6 +8,7 @@ import (
 
 // Config holds all configuration needed by this app.
 type Config struct {
+	GrpcServerPort                      int    `envconfig:"GRPC_SERVER_PORT" required:"true"`
 	StockServiceMetricsServerPort       int    `envconfig:"STOCK_SERVICE_METRICS_SERVER_PORT" required:"true"`
 	StockServiceClientMetricsServerPort int    `envconfig:"STOCK_SERVICE_CLIENT_METRICS_SERVER_PORT" required:"true"`
 	PromTemplateFile                    string `envconfig:"PROM_TEMPLATE_FILE" required:"true"`

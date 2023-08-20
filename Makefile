@@ -18,14 +18,13 @@ proto:
 	@ cd api/proto ; \
 	protoc --go_out=gen/stockservice --go_opt=paths=source_relative --go-grpc_out=gen/stockservice --go-grpc_opt=paths=source_relative stockservice.proto
 
-
 # ==============================================================================
 # gRPC server execution
 
 .PHONY: server
 ## server: runs gRPC server
 server:
-	@ go run cmd/main.go
+	@ go run cmd/main.go -i 5
 
 .PHONY: client
 ## client: runs gRPC client
@@ -53,4 +52,4 @@ obs: parse-templates
 .PHONY: obs-stop
 ## obs-stop: stops both prometheus and grafana
 obs-stop:
-	@ docker-compose down
+	@ docker-compose down -v

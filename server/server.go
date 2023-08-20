@@ -24,13 +24,17 @@ var sentUpdatesCounter = promauto.NewCounter(prometheus.CounterOpts{
 // server struct holds the gRPC server instance and implements the StockServiceServer interface.
 type server struct {
 	stockservice.UnimplementedStockServiceServer
-	GrpcSrv *grpc.Server
+	GrpcSrv      *grpc.Server
+	initialDelay int
 }
 
 // New initializes and returns a new gRPC server with the StockService registered.
-func New() *server {
+func New(initialDelay int) *server {
 	grpcServer := grpc.NewServer()
-	srv := &server{GrpcSrv: grpcServer}
+	srv := &server{
+		GrpcSrv:      grpcServer,
+		initialDelay: initialDelay,
+	}
 
 	// Register the StockService with the gRPC server instance.
 	stockservice.RegisterStockServiceServer(grpcServer, srv)
@@ -48,6 +52,7 @@ func (s *server) GetUpdates(_ *stockservice.EmptyRequest, stream stockservice.St
 		startingPrice = 150.0
 	)
 	stock := stock.New(ticker, startingPrice)
+	time.Sleep(time.Duration(s.initialDelay) * time.Second)
 	for {
 		update := stock.RandomUpdate()
 		if err := stream.Send(update); err != nil {
