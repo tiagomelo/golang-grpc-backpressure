@@ -13,6 +13,13 @@ services:
       - ./obs/provisioning/datasources:/etc/grafana/provisioning/datasources
     networks:
       - monitoring_network
+  
+  renderer:
+    image: grafana/grafana-image-renderer:latest
+    ports:
+      - 8081
+    networks:
+      - monitoring_network
 
   prometheus:
     image: prom/prometheus:latest
