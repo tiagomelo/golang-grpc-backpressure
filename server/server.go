@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// sentUpdatesCounter is a Prometheus metric to keep track of the number of sent stock updates.
 var sentUpdatesCounter = promauto.NewCounter(prometheus.CounterOpts{
 	Name: "stock_updates_sent_total",
 	Help: "The total number of stock updates sent by the server",
@@ -59,6 +60,6 @@ func (s *server) GetUpdates(_ *stockservice.EmptyRequest, stream stockservice.St
 			return status.Error(codes.Unknown, "failed to send update to client: "+err.Error())
 		}
 		sentUpdatesCounter.Inc()
-		time.Sleep(1 * time.Second) // Wait for a second before sending the next update.
+		time.Sleep(100 * time.Millisecond)
 	}
 }

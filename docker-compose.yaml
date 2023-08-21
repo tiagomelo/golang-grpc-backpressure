@@ -13,13 +13,6 @@ services:
       - ./obs/provisioning/datasources:/etc/grafana/provisioning/datasources
     networks:
       - monitoring_network
-  
-  renderer:
-    image: grafana/grafana-image-renderer:latest
-    ports:
-      - 8081
-    networks:
-      - monitoring_network
 
   prometheus:
     image: prom/prometheus:latest
@@ -33,6 +26,16 @@ services:
       - 9090:9090
     networks:
       - monitoring_network
+
+  renderer:
+    image: grafana/grafana-image-renderer:latest
+    ports:
+      - 8081
+    networks:
+      - monitoring_network
+    depends_on:
+      - grafana
+    restart: on-failure
 
 networks:
   monitoring_network:
